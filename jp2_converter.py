@@ -39,11 +39,11 @@ def convert_single_file(input_path, output_path, target_format, quality=None, re
         
         # 保存参数
         save_args = {}
-        if quality is not None and target_format.lower() in ['jpg', 'jpeg']:
+        if quality is not None and target_format.lower() in ['jpg', 'jpeg', 'jpg/jpeg']:
             save_args['quality'] = quality
         
         # 保存为指定格式
-        if target_format.lower() in ['jpg', 'jpeg']:
+        if target_format.lower() in ['jpg', 'jpeg', 'jpg/jpeg']:
             img.save(output_path, format='JPEG', **save_args)
         else:
             img.save(output_path, format=target_format.upper(), **save_args)
@@ -164,7 +164,7 @@ def main():
     parser = argparse.ArgumentParser(description='JP2文件格式转换工具')
     parser.add_argument('input_dir', help='输入目录路径')
     parser.add_argument('output_dir', help='输出目录路径')
-    parser.add_argument('format', choices=['png', 'jpg', 'jpeg', 'bmp', 'tiff'], 
+    parser.add_argument('format', choices=['png', 'jpg/jpeg', 'bmp', 'tiff'], 
                        help='目标格式（png/jpg/jpeg/bmp/tiff）')
     parser.add_argument('-q', '--quality', type=int, choices=range(1, 101), metavar="[1-100]",
                        help='图像质量 (1-100, 仅对jpg/jpeg有效)')

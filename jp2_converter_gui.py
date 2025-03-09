@@ -36,7 +36,7 @@ class JP2ConverterGUI(tk.Tk):
         # 初始化变量
         self.input_dir = tk.StringVar()
         self.output_dir = tk.StringVar()
-        self.target_format = tk.StringVar(value="jpg")
+        self.target_format = tk.StringVar(value="jpg/jpeg")
         self.quality = tk.IntVar(value=90)
         self.resize_width = tk.IntVar(value=0)
         self.resize_height = tk.IntVar(value=0)
@@ -200,7 +200,7 @@ class JP2ConverterGUI(tk.Tk):
         
         ttk.Label(format_frame, text="目标格式:").pack(side=tk.LEFT)
         
-        formats = ["jpg", "jpeg", "png", "bmp", "tiff"]
+        formats = ["jpg/jpeg", "png", "bmp", "tiff"]
         format_combobox = ttk.Combobox(format_frame, textvariable=self.target_format, values=formats, state="readonly", width=10)
         format_combobox.pack(side=tk.LEFT, padx=5)
         
@@ -320,8 +320,7 @@ class JP2ConverterGUI(tk.Tk):
         total_files = 0
         
         # 遍历目录
-        walk_fn = os.walk if recursive else lambda d: [(d, [d for d in os.listdir(d) if os.path.isdir(os.path.join(d, d))], [f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))])]
-        
+        walk_fn = os.walk if recursive else lambda d: [(d, [d for d in os.listdir(d) if os.path.isdir(os.path.join(d, d))], [f for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))])]        
         self.log(f"开始扫描目录: {input_dir}")
         for root, dirs, files in walk_fn(input_dir):
             # 创建对应的输出目录结构
@@ -332,7 +331,9 @@ class JP2ConverterGUI(tk.Tk):
             for file in files:
                 if file.lower().endswith('.jp2'):
                     input_path = os.path.join(root, file)
-                    output_filename = os.path.splitext(file)[0] + '.' + target_format.lower()
+                    # 处理jpg/jpeg格式选项
+                    actual_format = "jpg" if target_format == "jpg/jpeg" else target_format
+                    output_filename = os.path.splitext(file)[0] + '.' + actual_format.lower()
                     output_path = os.path.join(output_subdir, output_filename)
                     
                     # 添加到任务列表
@@ -340,7 +341,7 @@ class JP2ConverterGUI(tk.Tk):
                     if self.resize_width.get() > 0 and self.resize_height.get() > 0:
                         resize = (self.resize_width.get(), self.resize_height.get())
                     
-                    conversion_tasks.append((input_path, output_path, target_format, quality, resize))
+                    conversion_tasks.append((input_path, output_path, actual_format, quality, resize))
                     total_files += 1
         
         self.log(f"扫描完成，找到 {total_files} 个JP2文件")
